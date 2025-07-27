@@ -23,45 +23,68 @@
     <label for="name">Discord Handle</label>
     <input type="text" id="name" name="name" required />
 
-    <label for="days">Available Days (e.g., Mon, Fri)</label>
-    <input type="text" id="days" name="days" />
+    <label>Available Days</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="days" value="Mon" /> Mon</label>
+      <label><input type="checkbox" name="days" value="Tue" /> Tue</label>
+      <label><input type="checkbox" name="days" value="Wed" /> Wed</label>
+      <label><input type="checkbox" name="days" value="Thu" /> Thu</label>
+      <label><input type="checkbox" name="days" value="Fri" /> Fri</label>
+      <label><input type="checkbox" name="days" value="Sat" /> Sat</label>
+      <label><input type="checkbox" name="days" value="Sun" /> Sun</label>
+    </div>
 
-    <label for="timezone">Time Zone</label>
-    <input type="text" id="timezone" name="timezone" />
+    <label>Time Zone</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="timezone" value="PST" /> PST</label>
+      <label><input type="checkbox" name="timezone" value="MST" /> MST</label>
+      <label><input type="checkbox" name="timezone" value="CST" /> CST</label>
+      <label><input type="checkbox" name="timezone" value="EST" /> EST</label>
+    </div>
 
     <label>Platforms</label>
     <div class="checkbox-group">
+      <label><input type="checkbox" name="platforms" value="Nintendo Switch" /> Nintendo Switch</label>
+      <label><input type="checkbox" name="platforms" value="Nintendo Switch 2" /> Nintendo Switch 2</label>
       <label><input type="checkbox" name="platforms" value="PS5" /> PS5</label>
       <label><input type="checkbox" name="platforms" value="PS4" /> PS4</label>
       <label><input type="checkbox" name="platforms" value="Xbox Series X" /> Xbox Series X</label>
       <label><input type="checkbox" name="platforms" value="Xbox One" /> Xbox One</label>
-      <label><input type="checkbox" name="platforms" value="Nintendo Switch" /> Nintendo Switch</label>
       <label><input type="checkbox" name="platforms" value="PC" /> PC</label>
       <label><input type="checkbox" name="platforms" value="Steam Deck" /> Steam Deck</label>
       <label><input type="checkbox" name="platforms" value="Mobile" /> Mobile</label>
     </div>
 
-    <label for="subs">Online Subscriptions (comma separated)</label>
-    <input type="text" id="subs" name="subs" />
+    <label>Online Subscriptions</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="subs" value="Nintendo Switch Online" /> Nintendo Switch Online</label>
+      <label><input type="checkbox" name="subs" value="PS+ Essential" /> PS+ Essential</label>
+      <label><input type="checkbox" name="subs" value="PS+ Extra" /> PS+ Extra</label>
+      <label><input type="checkbox" name="subs" value="Xbox Game Pass" /> Xbox Game Pass</label>
+      <label><input type="checkbox" name="subs" value="Xbox Live Gold" /> Xbox Live Gold</label>
+      <label><input type="checkbox" name="subs" value="Steam" /> Steam</label>
+      <label><input type="checkbox" name="subs" value="EA Play" /> EA Play</label>
+    </div>
 
-    <label for="free">Free-to-Play Games</label>
-    <input type="text" id="free" name="free" />
+    <label>Free-to-Play Games</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="free" value="Fortnite" /> Fortnite</label>
+      <label><input type="checkbox" name="free" value="Rocket League" /> Rocket League</label>
+      <label><input type="checkbox" name="free" value="Fall Guys" /> Fall Guys</label>
+    </div>
 
     <label>Paid Multiplayer Games</label>
     <div class="checkbox-group">
       <label><input type="checkbox" name="paid" value="Mario Kart 8 Deluxe" /> Mario Kart 8 Deluxe</label>
+      <label><input type="checkbox" name="paid" value="Mario Kart 8 Deluxe" /> Mario Kart World</label>
       <label><input type="checkbox" name="paid" value="Super Smash Bros Ultimate" /> Super Smash Bros Ultimate</label>
       <label><input type="checkbox" name="paid" value="Minecraft" /> Minecraft</label>
       <label><input type="checkbox" name="paid" value="Among Us" /> Among Us</label>
       <label><input type="checkbox" name="paid" value="Splatoon 3" /> Splatoon 3</label>
-      <label><input type="checkbox" name="paid" value="Diablo IV" /> Diablo IV</label>
-      <label><input type="checkbox" name="paid" value="Call of Duty" /> Call of Duty</label>
-      <label><input type="checkbox" name="paid" value="Monster Hunter Rise" /> Monster Hunter Rise</label>
-      <label><input type="checkbox" name="paid" value="Helldivers II" /> Helldivers II</label>
       <label><input type="checkbox" name="paid" value="Jackbox Party Pack" /> Jackbox Party Pack</label>
     </div>
 
-    <label for="notes">Notes or Other Games</label>
+    <label for="notes">Notes or Other Game Suggestions</label>
     <textarea id="notes" name="notes"></textarea>
 
     <button type="submit">Submit</button>
@@ -71,18 +94,22 @@
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
+      const getChecked = (name) =>
+        [...document.querySelectorAll(`input[name='${name}']:checked`)]
+          .map(cb => cb.value)
+          .join(', ');
+
       const data = new FormData(e.target);
-      const getChecked = (name) => [...document.querySelectorAll(`input[name='${name}']:checked`)].map(cb => cb.value).join(', ');
 
       const entry = [
         data.get('name'),
-        data.get('days'),
-        data.get('timezone'),
+        getChecked('days'),
+        getChecked('timezone'),
         getChecked('platforms'),
-        data.get('subs'),
-        data.get('free'),
+        getChecked('subs'),
+        getChecked('free'),
         getChecked('paid'),
-        data.get('notes').replace(/\n/g, ' ')
+        data.get('notes')?.replace(/\n/g, ' ')
       ].map(item => `"${item}"`).join(',') + '\n';
 
       const blob = new Blob([entry], { type: 'text/plain' });
