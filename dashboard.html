@@ -3,99 +3,152 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Discord Game Night Dashboard</title>
+  <title>Game Night Dashboard</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background-color: #f8f9fa;
-      color: #212529;
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    h1, h2 {
+      color: #222;
     }
 
     h1 {
-      text-align: center;
-      color: #343a40;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
 
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      justify-content: center;
-      margin-bottom: 3rem;
+    h2 {
+      margin-top: 2rem;
+      font-size: 1.4rem;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 0.25rem;
     }
 
-    .card {
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      padding: 1rem 1.5rem;
-      min-width: 250px;
-      max-width: 300px;
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 1rem 0;
     }
 
-    .card h2 {
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
-      color: #495057;
-      border-bottom: 1px solid #dee2e6;
-      padding-bottom: 0.3rem;
-    }
-
-    .card ul {
-      padding-left: 1rem;
-      list-style-type: disc;
-    }
-
-    .card li {
-      font-size: 0.95rem;
-      margin: 0.25rem 0;
+    ul li {
+      padding: 0.3rem 0;
+      border-bottom: 1px solid #eee;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      border-radius: 8px;
-      overflow: hidden;
+      margin-top: 1rem;
+      background-color: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
     }
 
     th, td {
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid #dee2e6;
+      padding: 0.75rem;
       text-align: left;
+      border-bottom: 1px solid #ddd;
     }
 
     th {
-      background-color: #343a40;
-      color: #fff;
+      background-color: #f0f0f0;
+      font-weight: bold;
     }
 
     tr:hover {
-      background-color: #f1f3f5;
+      background-color: #f5f5f5;
     }
 
-    .table-container {
-      overflow-x: auto;
+    @media (max-width: 768px) {
+      body {
+        margin: 1rem;
+      }
+
+      th, td {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <h1>🎮 Discord Game Night Dashboard</h1>
 
-  <section class="stats" id="stats-container">
-    <!-- Stats cards injected here -->
-  </section>
+  <div id="stats">
+    <h2>Top Platforms</h2>
+    <ul id="topPlatforms"></ul>
 
-  <div class="table-container">
-    <table id="submissions-table">
-      <thead></thead>
-      <tbody></tbody>
-    </table>
+    <h2>Top Free Games</h2>
+    <ul id="topFreeGames"></ul>
+
+    <h2>Top Paid Games</h2>
+    <ul id="topPaidGames"></ul>
+
+    <h2>Top Nights</h2>
+    <ul id="topNights"></ul>
   </div>
 
-  <script src="submissions.js"></script>
+  <h2>All Submissions</h2>
+  <table id="submissionsTable">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchData() {
+      try {
+        const res = await fetch("/api/submissions");
+        const data = await res.json();
+
+        const createList = (stats, elementId) => {
+          const ul = document.getElementById(elementId);
+          ul.innerHTML = "";
+          Object.entries(stats)
+            .sort((a, b) => b[1] - a[1])
+            .forEach(([item, count]) => {
+              const li = document.createElement("li");
+              li.textContent = `${item}: ${count}`;
+              ul.appendChild(li);
+            });
+        };
+
+        createList(data.stats.topPlatforms, "topPlatforms");
+        createList(data.stats.topFreeGames, "topFreeGames");
+        createList(data.stats.topPaidGames, "topPaidGames");
+        createList(data.stats.topNights, "topNights");
+
+        const tableHead = document.querySelector("#submissionsTable thead");
+        const tableBody = document.querySelector("#submissionsTable tbody");
+
+        if (data.submissions.length > 0) {
+          const headers = Object.keys(data.submissions[0]);
+          const headerRow = document.createElement("tr");
+          headers.forEach(header => {
+            const th = document.createElement("th");
+            th.textContent = header;
+            headerRow.appendChild(th);
+          });
+          tableHead.appendChild(headerRow);
+
+          data.submissions.forEach(sub => {
+            const row = document.createElement("tr");
+            headers.forEach(header => {
+              const td = document.createElement("td");
+              td.textContent = sub[header];
+              row.appendChild(td);
+            });
+            tableBody.appendChild(row);
+          });
+        }
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      }
+    }
+
+    fetchData();
+  </script>
 </body>
 </html>
