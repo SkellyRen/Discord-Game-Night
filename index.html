@@ -76,7 +76,7 @@
     <label>Paid Multiplayer Games</label>
     <div class="checkbox-group">
       <label><input type="checkbox" name="paid" value="Mario Kart 8 Deluxe" /> Mario Kart 8 Deluxe</label>
-      <label><input type="checkbox" name="paid" value="Mario Kart 8 Deluxe" /> Mario Kart World</label>
+      <label><input type="checkbox" name="paid" value="Mario Kart World" /> Mario Kart World</label>
       <label><input type="checkbox" name="paid" value="Super Smash Bros Ultimate" /> Super Smash Bros Ultimate</label>
       <label><input type="checkbox" name="paid" value="Minecraft" /> Minecraft</label>
       <label><input type="checkbox" name="paid" value="Among Us" /> Among Us</label>
@@ -101,20 +101,36 @@
 
       const data = new FormData(e.target);
 
-      const entry = [
-        data.get('name'),
-        getChecked('nights'),
-        getChecked('timezone'),
-        getChecked('platforms'),
-        getChecked('subs'),
-        getChecked('free'),
-        getChecked('paid'),
-        data.get('notes')?.replace(/\n/g, ' ')
-      ].map(item => `"${item}"`).join(',') + '\n';
+      const payload = {
+        event_type: "form-submission",
+        client_payload: {
+          name: data.get('name'),
+          nights: getChecked('nights'),
+          timezone: getChecked('timezone'),
+          platforms: getChecked('platforms'),
+          subs: getChecked('subs'),
+          free: getChecked('free'),
+          paid: getChecked('paid'),
+          notes: data.get('notes')?.replace(/\n/g, ' ')
+        }
+      };
 
-      const blob = new Blob([entry], { type: 'text/plain' });
+      const response = await fetch("https://api.github.com/repos/skellyren/Discord-Game-Night/dispatches", {
+        method: "POST",
+        headers: {
+          "Accept": "application/vnd.github+json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
 
-      alert("Form submitted! Entry recorded. Make sure GitHub Actions is set up to persist this.");
+      if (response.ok) {
+        alert("🎉 Submission received! GitHub Action triggered.");
+        e.target.reset();
+      } else {
+        alert("❌ Error sending data. Check console.");
+        console.error(await response.text());
+      }
     });
   </script>
 </body>
