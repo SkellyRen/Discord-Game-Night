@@ -12,39 +12,47 @@
       color: #333;
     }
 
-    h1, h2 {
-      color: #222;
-    }
-
     h1 {
       font-size: 2rem;
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
+      text-align: center;
     }
 
     h2 {
-      margin-top: 2rem;
       font-size: 1.4rem;
+      margin-bottom: 0.5rem;
       border-bottom: 2px solid #ccc;
       padding-bottom: 0.25rem;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
     }
 
     ul {
       list-style: none;
       padding: 0;
-      margin: 0.5rem 0 1rem 0;
+      margin: 0.5rem 0 0 0;
     }
 
     ul li {
-      padding: 0.3rem 0;
+      padding: 0.35rem 0;
       border-bottom: 1px solid #eee;
+    }
+
+    .table-container {
+      overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       background-color: white;
-      box-shadow: 0 0 5px rgba(0,0,0,0.05);
     }
 
     th, td {
@@ -55,11 +63,14 @@
 
     th {
       background-color: #f0f0f0;
-      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
     }
 
     tr:hover {
-      background-color: #f5f5f5;
+      background-color: #f1f1f1;
     }
 
     @media (max-width: 768px) {
@@ -77,25 +88,33 @@
 <body>
   <h1>🎮 Discord Game Night Dashboard</h1>
 
-  <div id="stats">
+  <div class="card">
     <h2>Top Platforms</h2>
     <ul id="topPlatforms"></ul>
+  </div>
 
+  <div class="card">
     <h2>Top Free Games</h2>
     <ul id="topFreeGames"></ul>
+  </div>
 
+  <div class="card">
     <h2>Top Paid Games</h2>
     <ul id="topPaidGames"></ul>
+  </div>
 
+  <div class="card">
     <h2>Top Nights</h2>
     <ul id="topNights"></ul>
   </div>
 
-  <h2>All Submissions</h2>
-  <table id="submissionsTable">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
+  <div class="card table-container">
+    <h2>All Submissions</h2>
+    <table id="submissionsTable">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
     async function fetchData() {
