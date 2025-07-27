@@ -1,60 +1,81 @@
-// File: api/submissions.js
+// File: api/submit.js
+
 import { Octokit } from "@octokit/rest";
 
-const repoOwner = "SkellyRen"; // GitHub username (case-sensitive)
-const repoName = "Discord-Game-Night"; // Your repo name
-const filePath = "submissions.csv"; // Path to the CSV in the repo
-
-/**
- * Helper function to count votes in a semicolon-delimited field
- */
-function countVotes(entries, field) {
-  const counts = {};
-  for (const entry of entries) {
-    const values = (entry[field] || "").split(";").map(s => s.trim());
-    for (const val of values) {
-      if (!val) continue;
-      counts[val] = (counts[val] || 0) + 1;
-    }
-  }
-  return counts;
-}
+const repoOwner = "skellyren";
+const repoName = "Discord-Game-Night";
+const filePath = "submissions.csv";
 
 export default async function handler(req, res) {
-  const octokit = new Octokit({
-    auth: process.env.GH_ISSUE_TOKEN // Set in Vercel or .env.local
-  });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const {
+    name = "",
+    nights = [],
+    timezone = [],
+    platforms = [],
+    subs = [],
+    free = [],
+    paid = [],
+    notes = ""
+  } = req.body;
+
+  const newRow = `"${name}","${nights.join(";")}","${timezone.join(";")}","${platforms.join(";")}","${subs.join(";")}","${free.join(";")}","${paid.join(";")}","${notes.replace(/\n/g, ' ')}"\n`;
+
+  const octokit = new Octokit({ auth: process.env.GH_ISSUE_TOKEN });
 
   try {
-    // Get CSV file content
-    const { data: file } = await octokit.repos.getContent({
+    // Get latest commit SHA
+    const { data: refData } = await octokit.git.getRef({
       owner: repoOwner,
       repo: repoName,
-      path: filePath
+      ref: "heads/main"
     });
 
-    const csvContent = Buffer.from(file.content, 'base64').toString('utf8');
-    const lines = csvContent.trim().split('\n');
+    const latestCommitSha = refData.object.sha;
 
-    const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
-    const entries = lines.slice(1).map(line => {
-      const values = line.split(',').map(v => v.replace(/"/g, ''));
-      return headers.reduce((obj, header, idx) => {
-        obj[header] = values[idx] || "";
-        return obj;
-      }, {});
+    const { data: commitData } = await octokit.git.getCommit({
+      owner: repoOwner,
+      repo: repoName,
+      commit_sha: latestCommitSha
     });
 
-    const stats = {
-      topPlatforms: countVotes(entries, "Platforms"),
-      topFreeGames: countVotes(entries, "Free"),
-      topPaidGames: countVotes(entries, "Paid"),
-      topNights: countVotes(entries, "Nights")
-    };
+    const baseTree = commitData.tree.sha;
 
-    res.status(200).json({ submissions: entries, stats });
+    // Try reading the existing CSV
+    let currentContent = "Name,Nights,Timezone,Platforms,Subs,Free,Paid,Notes\n"; // default if missing
+    let currentSha = null;
+
+    try {
+      const { data: file } = await octokit.repos.getContent({
+        owner: repoOwner,
+        repo: repoName,
+        path: filePath
+      });
+
+      currentContent = Buffer.from(file.content, "base64").toString("utf8");
+      currentSha = file.sha;
+    } catch (err) {
+      if (err.status !== 404) throw err; // Only ignore file-not-found
+    }
+
+    const updatedContent = currentContent + newRow;
+
+    await octokit.repos.createOrUpdateFileContents({
+      owner: repoOwner,
+      repo: repoName,
+      path: filePath,
+      message: `Add submission from ${name}`,
+      content: Buffer.from(updatedContent).toString("base64"),
+      sha: currentSha || undefined,
+      branch: "main"
+    });
+
+    res.status(200).json({ message: "Submission saved!" });
   } catch (error) {
-    console.error("Error loading submissions:", error);
-    res.status(500).json({ error: "Could not load submissions." });
+    console.error(error);
+    res.status(500).json({ error: "Failed to save submission." });
   }
 }
