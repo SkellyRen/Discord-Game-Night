@@ -23,15 +23,15 @@
     <label for="name">Discord Handle</label>
     <input type="text" id="name" name="name" required />
 
-    <label>Available Days</label>
+    <label>Available Nights</label>
     <div class="checkbox-group">
-      <label><input type="checkbox" name="days" value="Mon" /> Mon</label>
-      <label><input type="checkbox" name="days" value="Tue" /> Tue</label>
-      <label><input type="checkbox" name="days" value="Wed" /> Wed</label>
-      <label><input type="checkbox" name="days" value="Thu" /> Thu</label>
-      <label><input type="checkbox" name="days" value="Fri" /> Fri</label>
-      <label><input type="checkbox" name="days" value="Sat" /> Sat</label>
-      <label><input type="checkbox" name="days" value="Sun" /> Sun</label>
+      <label><input type="checkbox" name="nights" value="Mon" /> Mon</label>
+      <label><input type="checkbox" name="nights" value="Tue" /> Tue</label>
+      <label><input type="checkbox" name="nights" value="Wed" /> Wed</label>
+      <label><input type="checkbox" name="nights" value="Thu" /> Thu</label>
+      <label><input type="checkbox" name="nights" value="Fri" /> Fri</label>
+      <label><input type="checkbox" name="nights" value="Sat" /> Sat</label>
+      <label><input type="checkbox" name="nights" value="Sun" /> Sun</label>
     </div>
 
     <label>Time Zone</label>
@@ -103,7 +103,7 @@
 
       const entry = [
         data.get('name'),
-        getChecked('days'),
+        getChecked('nights'),
         getChecked('timezone'),
         getChecked('platforms'),
         getChecked('subs'),
