@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Night Signup</title>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; padding: 2em; }
+    form { background: white; padding: 2em; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 1em; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 0.5em; margin-top: 0.25em; border: 1px solid #ccc; border-radius: 4px; }
+    button { margin-top: 1.5em; background: #2d8cff; color: white; padding: 0.75em 1em; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #196edb; }
+  </style>
+</head>
+<body>
+  <form id="signup-form">
+    <h2>🎮 Game Night Signup</h2>
+
+    <label for="name">Discord Handle</label>
+    <input type="text" id="name" name="name" required />
+
+    <label for="days">Available Days (e.g., Mon, Fri)</label>
+    <input type="text" id="days" name="days" />
+
+    <label for="timezone">Time Zone</label>
+    <input type="text" id="timezone" name="timezone" />
+
+    <label for="platforms">Platforms (e.g., PS5, PC)</label>
+    <input type="text" id="platforms" name="platforms" />
+
+    <label for="subs">Online Subscriptions (comma separated)</label>
+    <input type="text" id="subs" name="subs" />
+
+    <label for="free">Free-to-Play Games</label>
+    <input type="text" id="free" name="free" />
+
+    <label for="paid">Paid Multiplayer Games</label>
+    <input type="text" id="paid" name="paid" />
+
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes"></textarea>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    document.getElementById('signup-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const data = new FormData(e.target);
+      const entry = [
+        data.get('name'),
+        data.get('days'),
+        data.get('timezone'),
+        data.get('platforms'),
+        data.get('subs'),
+        data.get('free'),
+        data.get('paid'),
+        data.get('notes').replace(/\n/g, ' ')
+      ].map(item => `"${item}"`).join(',') + '\n';
+
+      const blob = new Blob([entry], { type: 'text/plain' });
+
+      // GitHub Pages can't save files directly; you would need a GitHub Action to append to a CSV in your repo.
+      alert("Form submitted! Entry recorded. Make sure GitHub Actions is set up to persist this.");
+    });
+  </script>
+</body>
+</html>
