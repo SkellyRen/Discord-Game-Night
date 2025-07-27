@@ -6,9 +6,12 @@
   <title>Game Night Signup</title>
   <style>
     body { font-family: sans-serif; background: #f9f9f9; padding: 2em; }
-    form { background: white; padding: 2em; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    form { background: white; padding: 2em; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     label { display: block; margin-top: 1em; font-weight: bold; }
     input, select, textarea { width: 100%; padding: 0.5em; margin-top: 0.25em; border: 1px solid #ccc; border-radius: 4px; }
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 0.5em; margin-top: 0.5em; }
+    .checkbox-group label { font-weight: normal; }
+    .checkbox-group input { width: auto; margin-right: 0.25em; }
     button { margin-top: 1.5em; background: #2d8cff; color: white; padding: 0.75em 1em; border: none; border-radius: 4px; cursor: pointer; }
     button:hover { background: #196edb; }
   </style>
@@ -26,8 +29,17 @@
     <label for="timezone">Time Zone</label>
     <input type="text" id="timezone" name="timezone" />
 
-    <label for="platforms">Platforms (e.g., PS5, PC)</label>
-    <input type="text" id="platforms" name="platforms" />
+    <label>Platforms</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="platforms" value="PS5" /> PS5</label>
+      <label><input type="checkbox" name="platforms" value="PS4" /> PS4</label>
+      <label><input type="checkbox" name="platforms" value="Xbox Series X" /> Xbox Series X</label>
+      <label><input type="checkbox" name="platforms" value="Xbox One" /> Xbox One</label>
+      <label><input type="checkbox" name="platforms" value="Nintendo Switch" /> Nintendo Switch</label>
+      <label><input type="checkbox" name="platforms" value="PC" /> PC</label>
+      <label><input type="checkbox" name="platforms" value="Steam Deck" /> Steam Deck</label>
+      <label><input type="checkbox" name="platforms" value="Mobile" /> Mobile</label>
+    </div>
 
     <label for="subs">Online Subscriptions (comma separated)</label>
     <input type="text" id="subs" name="subs" />
@@ -35,10 +47,21 @@
     <label for="free">Free-to-Play Games</label>
     <input type="text" id="free" name="free" />
 
-    <label for="paid">Paid Multiplayer Games</label>
-    <input type="text" id="paid" name="paid" />
+    <label>Paid Multiplayer Games</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="paid" value="Mario Kart 8 Deluxe" /> Mario Kart 8 Deluxe</label>
+      <label><input type="checkbox" name="paid" value="Super Smash Bros Ultimate" /> Super Smash Bros Ultimate</label>
+      <label><input type="checkbox" name="paid" value="Minecraft" /> Minecraft</label>
+      <label><input type="checkbox" name="paid" value="Among Us" /> Among Us</label>
+      <label><input type="checkbox" name="paid" value="Splatoon 3" /> Splatoon 3</label>
+      <label><input type="checkbox" name="paid" value="Diablo IV" /> Diablo IV</label>
+      <label><input type="checkbox" name="paid" value="Call of Duty" /> Call of Duty</label>
+      <label><input type="checkbox" name="paid" value="Monster Hunter Rise" /> Monster Hunter Rise</label>
+      <label><input type="checkbox" name="paid" value="Helldivers II" /> Helldivers II</label>
+      <label><input type="checkbox" name="paid" value="Jackbox Party Pack" /> Jackbox Party Pack</label>
+    </div>
 
-    <label for="notes">Notes</label>
+    <label for="notes">Notes or Other Games</label>
     <textarea id="notes" name="notes"></textarea>
 
     <button type="submit">Submit</button>
@@ -49,20 +72,21 @@
       e.preventDefault();
 
       const data = new FormData(e.target);
+      const getChecked = (name) => [...document.querySelectorAll(`input[name='${name}']:checked`)].map(cb => cb.value).join(', ');
+
       const entry = [
         data.get('name'),
         data.get('days'),
         data.get('timezone'),
-        data.get('platforms'),
+        getChecked('platforms'),
         data.get('subs'),
         data.get('free'),
-        data.get('paid'),
+        getChecked('paid'),
         data.get('notes').replace(/\n/g, ' ')
       ].map(item => `"${item}"`).join(',') + '\n';
 
       const blob = new Blob([entry], { type: 'text/plain' });
 
-      // GitHub Pages can't save files directly; you would need a GitHub Action to append to a CSV in your repo.
       alert("Form submitted! Entry recorded. Make sure GitHub Actions is set up to persist this.");
     });
   </script>
