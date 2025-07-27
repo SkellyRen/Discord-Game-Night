@@ -8,7 +8,7 @@
     body { font-family: sans-serif; background: #f9f9f9; padding: 2em; }
     form { background: white; padding: 2em; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     label { display: block; margin-top: 1em; font-weight: bold; }
-    input, textarea { width: 100%; padding: 0.5em; margin-top: 0.25em; border: 1px solid #ccc; border-radius: 4px; }
+    input, select, textarea { width: 100%; padding: 0.5em; margin-top: 0.25em; border: 1px solid #ccc; border-radius: 4px; }
     .checkbox-group { display: flex; flex-wrap: wrap; gap: 0.5em; margin-top: 0.5em; }
     .checkbox-group label { font-weight: normal; }
     .checkbox-group input { width: auto; margin-right: 0.25em; }
@@ -91,7 +91,7 @@
   </form>
 
   <script>
-    document.getElementById('signup-form').addEventListener('submit', function(e) {
+    document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const getChecked = (name) =>
@@ -99,29 +99,39 @@
           .map(cb => cb.value)
           .join(', ');
 
-      const name = document.getElementById('name').value;
-      const nights = getChecked('nights');
-      const timezone = getChecked('timezone');
-      const platforms = getChecked('platforms');
-      const subs = getChecked('subs');
-      const free = getChecked('free');
-      const paid = getChecked('paid');
-      const notes = document.getElementById('notes').value.replace(/\n/g, ' ');
+      const data = new FormData(e.target);
 
-      const issueTitle = encodeURIComponent(`🎮 Game Night Signup - ${name}`);
-      const issueBody = encodeURIComponent(
-        `**Name**: ${name}\n` +
-        `**Available Nights**: ${nights}\n` +
-        `**Time Zone**: ${timezone}\n` +
-        `**Platforms**: ${platforms}\n` +
-        `**Online Subs**: ${subs}\n` +
-        `**Free-to-Play**: ${free}\n` +
-        `**Paid Games**: ${paid}\n` +
-        `**Notes**: ${notes}`
-      );
+      const payload = {
+        event_type: "form-submission",
+        client_payload: {
+          name: data.get('name'),
+          nights: getChecked('nights'),
+          timezone: getChecked('timezone'),
+          platforms: getChecked('platforms'),
+          subs: getChecked('subs'),
+          free: getChecked('free'),
+          paid: getChecked('paid'),
+          notes: data.get('notes')?.replace(/\n/g, ' ')
+        }
+      };
 
-      const url = `https://github.com/skellyren/Discord-Game-Night/issues/new?title=${issueTitle}&body=${issueBody}`;
-      window.open(url, '_blank');
+      const response = await fetch("https://api.github.com/repos/skellyren/Discord-Game-Night/dispatches", {
+        method: "POST",
+        headers: {
+          "Accept": "application/vnd.github+json",
+          "Authorization": "Bearer YOUR_DEPLOY_TOKEN",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        alert("🎉 Form submitted! We'll process your game night preferences.");
+        e.target.reset();
+      } else {
+        alert("❌ Something went wrong. See console.");
+        console.error(await response.text());
+      }
     });
   </script>
 </body>
