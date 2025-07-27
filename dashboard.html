@@ -3,113 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Game Night Dashboard</title>
+  <title>Discord Game Night Dashboard</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 2em;
-      background-color: #f9f9f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background-color: #f8f9fa;
+      color: #212529;
     }
+
     h1 {
-      margin-bottom: 0.5em;
+      text-align: center;
+      color: #343a40;
     }
-    section {
-      margin-bottom: 2em;
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 3rem;
     }
+
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 1rem 1.5rem;
+      min-width: 250px;
+      max-width: 300px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: #495057;
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 0.3rem;
+    }
+
+    .card ul {
+      padding-left: 1rem;
+      list-style-type: disc;
+    }
+
+    .card li {
+      font-size: 0.95rem;
+      margin: 0.25rem 0;
+    }
+
     table {
-      border-collapse: collapse;
       width: 100%;
+      border-collapse: collapse;
       background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow: hidden;
     }
+
     th, td {
-      padding: 0.75em;
-      border: 1px solid #ddd;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #dee2e6;
       text-align: left;
     }
+
     th {
-      background-color: #f2f2f2;
+      background-color: #343a40;
+      color: #fff;
     }
-    .stat-block {
-      margin-bottom: 1em;
+
+    tr:hover {
+      background-color: #f1f3f5;
     }
-    .stat-block ul {
-      padding-left: 1em;
+
+    .table-container {
+      overflow-x: auto;
     }
   </style>
 </head>
 <body>
-  <h1>Discord Game Night Dashboard</h1>
+  <h1>🎮 Discord Game Night Dashboard</h1>
 
-  <section id="stats">
-    <h2>Top Stats</h2>
-    <div class="stat-block">
-      <h3>Most Popular Platforms</h3>
-      <ul id="top-platforms"></ul>
-    </div>
-    <div class="stat-block">
-      <h3>Most Played Free Games</h3>
-      <ul id="top-free"></ul>
-    </div>
-    <div class="stat-block">
-      <h3>Most Played Paid Games</h3>
-      <ul id="top-paid"></ul>
-    </div>
-    <div class="stat-block">
-      <h3>Most Available Nights</h3>
-      <ul id="top-nights"></ul>
-    </div>
+  <section class="stats" id="stats-container">
+    <!-- Stats cards injected here -->
   </section>
 
-  <section>
-    <h2>All Submissions</h2>
+  <div class="table-container">
     <table id="submissions-table">
       <thead></thead>
       <tbody></tbody>
     </table>
-  </section>
+  </div>
 
-  <script>
-    async function fetchData() {
-      try {
-        const res = await fetch('/api/submissions');
-        const { submissions, stats } = await res.json();
-
-        const table = document.getElementById('submissions-table');
-        const thead = table.querySelector('thead');
-        const tbody = table.querySelector('tbody');
-
-        if (submissions.length === 0) {
-          thead.innerHTML = '<tr><th>No data</th></tr>';
-          return;
-        }
-
-        // Dynamic headers
-        const headers = Object.keys(submissions[0]);
-        thead.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
-
-        // Fill rows
-        tbody.innerHTML = submissions.map(row => {
-          return '<tr>' + headers.map(h => `<td>${row[h]}</td>`).join('') + '</tr>';
-        }).join('');
-
-        // Populate stats
-        const fillList = (id, items) => {
-          const el = document.getElementById(id);
-          const sorted = Object.entries(items).sort((a, b) => b[1] - a[1]);
-          el.innerHTML = sorted.map(([k, v]) => `<li>${k} (${v})</li>`).join('');
-        };
-
-        fillList('top-platforms', stats.topPlatforms);
-        fillList('top-free', stats.topFreeGames);
-        fillList('top-paid', stats.topPaidGames);
-        fillList('top-nights', stats.topNights);
-
-      } catch (err) {
-        console.error('Error loading submissions:', err);
-      }
-    }
-
-    fetchData();
-  </script>
+  <script src="submissions.js"></script>
 </body>
 </html>
