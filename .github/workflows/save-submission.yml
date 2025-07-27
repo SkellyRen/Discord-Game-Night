@@ -1,0 +1,44 @@
+name: Save Game Night Submissions
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  append_to_csv:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Append issue body to submissions.csv
+      run: |
+        echo "Processing issue #${{ github.event.issue.number }}"
+
+        echo "${{ github.event.issue.body }}" | awk '
+          BEGIN {
+            FS=": ";
+            OFS="\",\"";
+            ORS="\"\n\"";
+            print "\""
+          }
+          /^\\*\\*/ {
+            gsub(/\\*\\*/, "", $1);
+            printf "%s", $2
+          }
+        ' >> submissions.csv
+
+    - name: Commit updated CSV
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add submissions.csv
+        git commit -m "📥 Append submission from issue #${{ github.event.issue.number }}"
+        git push
+
+    - name: Close the Issue
+      uses: peter-evans/close-issue@v2
+      with:
+        token: ${{ secrets.GH_ISSUE_TOKEN }}
+        comment: "✅ Submission saved to `submissions.csv`. Thanks!"
