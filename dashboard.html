@@ -19,18 +19,26 @@
     }
 
     h2 {
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       margin-bottom: 0.5rem;
       border-bottom: 2px solid #ccc;
       padding-bottom: 0.25rem;
+    }
+
+    .stats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
     }
 
     .card {
       background-color: #fff;
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-      padding: 1rem 1.5rem;
-      margin-bottom: 2rem;
+      padding: 1rem 1.25rem;
+      flex: 1 1 250px;
+      min-width: 220px;
     }
 
     ul {
@@ -88,24 +96,23 @@
 <body>
   <h1>🎮 Discord Game Night Dashboard</h1>
 
-  <div class="card">
-    <h2>Top Platforms</h2>
-    <ul id="topPlatforms"></ul>
-  </div>
-
-  <div class="card">
-    <h2>Top Free Games</h2>
-    <ul id="topFreeGames"></ul>
-  </div>
-
-  <div class="card">
-    <h2>Top Paid Games</h2>
-    <ul id="topPaidGames"></ul>
-  </div>
-
-  <div class="card">
-    <h2>Top Nights</h2>
-    <ul id="topNights"></ul>
+  <div class="stats-grid">
+    <div class="card">
+      <h2>Platforms</h2>
+      <ul id="topPlatforms"></ul>
+    </div>
+    <div class="card">
+      <h2>Free Games</h2>
+      <ul id="topFreeGames"></ul>
+    </div>
+    <div class="card">
+      <h2>Paid Games</h2>
+      <ul id="topPaidGames"></ul>
+    </div>
+    <div class="card">
+      <h2>Nights</h2>
+      <ul id="topNights"></ul>
+    </div>
   </div>
 
   <div class="card table-container">
