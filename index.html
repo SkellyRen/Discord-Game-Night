@@ -18,7 +18,7 @@
 </head>
 <body>
   <form id="signup-form">
-    <h2>🎮 Game Night Sign-up</h2>
+    <h2>🎮 Game Night Signup</h2>
 
     <label for="name">Discord Handle</label>
     <input type="text" id="name" name="name" required />
@@ -91,6 +91,8 @@
   </form>
 
   <script>
+    const GITHUB_TOKEN = 'GH_ISSUE_TOKEN';
+
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
@@ -101,36 +103,36 @@
 
       const data = new FormData(e.target);
 
-      const body = `
-**Discord Handle**: ${data.get('name')}
-**Available Nights**: ${getChecked('nights')}
-**Time Zone**: ${getChecked('timezone')}
-**Platforms**: ${getChecked('platforms')}
-**Online Subs**: ${getChecked('subs')}
-**Free-to-Play Games**: ${getChecked('free')}
-**Paid Games**: ${getChecked('paid')}
-**Notes**: ${data.get('notes')?.replace(/\n/g, ' ')}
-`;
-
-      const issuePayload = {
-        title: `Game Night Signup - ${data.get('name')}`,
-        body: body
+      const payload = {
+        event_type: "game-night-signup",
+        client_payload: {
+          name: data.get('name'),
+          nights: getChecked('nights'),
+          timezone: getChecked('timezone'),
+          platforms: getChecked('platforms'),
+          subs: getChecked('subs'),
+          free: getChecked('free'),
+          paid: getChecked('paid'),
+          notes: data.get('notes')?.replace(/\n/g, ' ')
+        }
       };
 
-      const response = await fetch('https://api.github.com/repos/skellyren/Discord-Game-Night/issues', {
-        method: 'POST',
+      const response = await fetch("https://api.github.com/repos/skellyren/Discord-Game-Night/dispatches", {
+        method: "POST",
         headers: {
-          'Accept': 'application/vnd.github.v3+json'
+          "Authorization": `token ${GITHUB_TOKEN}`,
+          "Accept": "application/vnd.github.v3+json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(issuePayload)
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {
-        alert("🎉 Submission created! Your info has been received.");
+        alert("🎉 Submission successful!");
         e.target.reset();
       } else {
+        alert("❌ Submission failed.");
         console.error(await response.text());
-        alert("❌ Submission failed. Please try again later.");
       }
     });
   </script>
