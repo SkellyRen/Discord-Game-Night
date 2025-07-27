@@ -1,0 +1,22 @@
+name: Create Issue from Form Submission
+
+on:
+  repository_dispatch:
+    types: [form-submission]
+
+jobs:
+  create_issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create issue using GH_ISSUE_TOKEN
+        run: |
+          echo "Creating GitHub Issue..."
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GH_ISSUE_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues \
+            -d "$(jq -n \
+              --arg title "${{ github.event.client_payload.name }}" \
+              --arg body "**Name:** ${{ github.event.client_payload.name }}\n**Nights:** ${{ github.event.client_payload.nights }}\n**Timezone:** ${{ github.event.client_payload.timezone }}\n**Platforms:** ${{ github.event.client_payload.platforms }}\n**Subs:** ${{ github.event.client_payload.subs }}\n**Free Games:** ${{ github.event.client_payload.free }}\n**Paid Games:** ${{ github.event.client_payload.paid }}\n**Notes:** ${{ github.event.client_payload.notes }}" \
+              '{title: $title, body: $body}')"
