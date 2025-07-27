@@ -100,29 +100,28 @@
           .join(', ');
 
       const data = new FormData(e.target);
+      const body = `**Name**: ${data.get('name')}\n` +
+                   `**Nights**: ${getChecked('nights')}\n` +
+                   `**Timezone**: ${getChecked('timezone')}\n` +
+                   `**Platforms**: ${getChecked('platforms')}\n` +
+                   `**Online Subs**: ${getChecked('subs')}\n` +
+                   `**Free Games**: ${getChecked('free')}\n` +
+                   `**Paid Games**: ${getChecked('paid')}\n` +
+                   `**Notes**: ${data.get('notes') || ''}`;
 
-      const content = [
-        `**Discord Handle:** ${data.get('name')}`,
-        `**Available Nights:** ${getChecked('nights')}`,
-        `**Time Zone:** ${getChecked('timezone')}`,
-        `**Platforms:** ${getChecked('platforms')}`,
-        `**Online Subscriptions:** ${getChecked('subs')}`,
-        `**Free-to-Play Games:** ${getChecked('free')}`,
-        `**Paid Multiplayer Games:** ${getChecked('paid')}`,
-        `**Notes:** ${data.get('notes') || ''}`
-      ].join('\n');
-
-      const GITHUB_TOKEN = "GH_ISSUE_TOKEN";
+    
+      const GITHUB_TOKEN = "GH_ISSUE_TOKEN"; 
 
       const response = await fetch("https://api.github.com/repos/skellyren/Discord-Game-Night/issues", {
         method: "POST",
         headers: {
           "Authorization": `token ${GITHUB_TOKEN}`,
-          "Accept": "application/vnd.github+json"
+          "Accept": "application/vnd.github+json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           title: `Game Night Signup - ${data.get('name')}`,
-          body: content
+          body
         })
       });
 
@@ -130,7 +129,7 @@
         alert("🎉 Signup submitted successfully!");
         e.target.reset();
       } else {
-        alert("❌ There was a problem submitting the form. Check the console for details.");
+        alert("❌ Submission failed. Check console for details.");
         console.error(await response.text());
       }
     });
