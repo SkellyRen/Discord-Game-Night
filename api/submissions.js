@@ -1,13 +1,10 @@
 // File: api/submissions.js
 import { Octokit } from "@octokit/rest";
 
-const repoOwner = "SkellyRen"; // GitHub username (case-sensitive)
-const repoName = "Discord-Game-Night"; // Your repo name
-const filePath = "submissions.csv"; // Path to the CSV in the repo
+const repoOwner = "SkellyRen";
+const repoName = "Discord-Game-Night";
+const filePath = "submissions.csv";
 
-/**
- * Helper function to count votes in a semicolon-delimited field
- */
 function countVotes(entries, field) {
   const counts = {};
   for (const entry of entries) {
@@ -22,11 +19,10 @@ function countVotes(entries, field) {
 
 export default async function handler(req, res) {
   const octokit = new Octokit({
-    auth: process.env.GH_ISSUE_TOKEN // Set in Vercel or .env.local
+    auth: process.env.GH_ISSUE_TOKEN
   });
 
   try {
-    // Get CSV file content
     const { data: file } = await octokit.repos.getContent({
       owner: repoOwner,
       repo: repoName,
@@ -35,7 +31,6 @@ export default async function handler(req, res) {
 
     const csvContent = Buffer.from(file.content, 'base64').toString('utf8');
     const lines = csvContent.trim().split('\n');
-
     const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
     const entries = lines.slice(1).map(line => {
       const values = line.split(',').map(v => v.replace(/"/g, ''));
